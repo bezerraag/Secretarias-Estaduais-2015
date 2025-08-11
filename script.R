@@ -1,12 +1,16 @@
+#Dependências
 library(dplyr)
 library(dplyr)
 library(ggplot2)
 
+#Importando dados
 data <- read.csv("data.csv")[c(17, 18)]
 summary(data)
 
+#Trocando vírgulas por pontos
 data$X.TOTAL <- as.numeric(gsub(",", ".", data$X.TOTAL))
 
+#Testando normalidade e possibilidades de correção
 correct <- function (x) {
   l <- list(
     og       = function(x) x,        #Valor original
@@ -29,8 +33,10 @@ correct <- function (x) {
 }
 correct(data$X.TOTAL)  
 
+#Calculando o p-valor do teste de variação de médias
 p.value <- round(wilcox.test(X.TOTAL ~ ESCOLHA, data)$p.value, digits = 4)
 
+#Calculando média e mediana para exibição
 r <- data %>%
   group_by(ESCOLHA) %>%
   summarise(
@@ -42,6 +48,7 @@ r <- r %>%
                       names_to  = "Type",
                       values_to = "Value")
 
+#Gerando gráfico
 ggplot(data) +
   aes(ESCOLHA, X.TOTAL) +
   geom_boxplot(outliers = F) +
